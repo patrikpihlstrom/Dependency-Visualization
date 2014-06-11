@@ -9,6 +9,5 @@ Example Images
 
 ![alt text](http://i.imgur.com/Eb3V1C3.png "Transitive Dependency Visualization Example Image")
 
-![alt text](http://i.imgur.com/EQuKCpN.png "Transitive Dependency Visualization Example Image")
-
-![alt text](http://i.imgur.com/WB6baOT.png "Transitive Dependency Visualization Example Image")
+A more realistic example image:
+![alt text](http://i.imgur.com/o7qHhSK.png "Transitive Dependency Visualization Example Image")
