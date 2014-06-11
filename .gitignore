@@ -1,0 +1,35 @@
+# Visual Studio things
+*.suo
+*.user
+*.sln.docstates
+
+#Build results
+[Dd]ebug/
+[Rr]elease/
+
+#### C++ STUFF
+# Compiled Object files
+*.slo
+*.lo
+*.o
+*.obj
+
+# Compiled Dynamic libraries
+*.so
+*.dylib
+*.dll
+
+# Compiled Static libraries
+*.lai
+*.la
+*.a
+*.lib
+
+# Executables
+*.exe
+*.out
+*.app
+
+# Sublime
+*.sublime-workspace
+*.sublime-project
