@@ -151,11 +151,13 @@ void Main::setPosition(Node & p_node)
 {
 	float angle = math::random(0, 360);
 
-	
+
 	angle = math::toRadians(angle);
 
-	float radius = (310/m_levels)*p_node.m_dependencies.size();
-	
+	float radius = 320 - (310/m_levels)*p_node.m_dependencies.size();
+
+	//std::cout << p_node.m_identifier << ": " << radius << "\n";
+
 	p_node.m_position.x = std::cos(angle)*radius + 320;
 	p_node.m_position.y = std::sin(angle)*radius + 320;
 }
@@ -199,14 +201,14 @@ void Main::render()
 
 	for (auto it = m_nodes.begin(); it != m_nodes.end(); ++it)
 	{
-		sf::Vertex point;
-		point.position = (sf::Vector2<float>)it->second.m_position;
-		point.color = sf::Color::White;
-
-		lines.append(point);
-
 		for (auto iter = it->second.m_dependencies.begin(); iter != it->second.m_dependencies.end(); ++iter)
 		{
+			sf::Vertex point;
+			point.position = (sf::Vector2<float>)it->second.m_position;
+			point.color = sf::Color::White;
+
+			lines.append(point);
+
 			sf::Vertex _point;
 			_point.position = (sf::Vector2<float>)m_nodes[*iter].m_position;
 			_point.color = sf::Color::Black;
