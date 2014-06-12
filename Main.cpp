@@ -1,87 +1,107 @@
 #include "Main.h"
 
-int main()
+int main(int argc, char* argv[])
 {
 	srand(static_cast<int>(time(NULL)));
-	Main main = Main();
+	Main main = Main(argv[1]);
 	return 0;
 }
 
-Main::Main() :
+Main::Main(const std::string & p_path) :
 	m_window(sf::VideoMode(640, 640), "Transitive Dependency Visualizer"),
 	m_running(true),
 	m_active(true),
 	m_levels(0)
 {
-	std::ifstream file;
-	file.open("dependencies");
+	std::vector<std::string> files;
 
-	if (file.is_open())
-	{
-		std::map<char, Node> temp;
-
-		char last;
-
-		while(!file.eof())
-		{
-			std::string line;
-			std::getline(file, line);
-
-			Node node(line);
-
-			temp[node.m_identifier] = node;
-
-			node.m_dependencies.clear();
-
-			m_nodes[node.m_identifier] = node;
-
-			last = node.m_identifier;
+	DIR *dir;
+	struct dirent *ent;
+	if ((dir = opendir (p_path.c_str())) != NULL) {
+		while ((ent = readdir (dir)) != NULL) {
+			files.push_back(ent->d_name);
 		}
-
-		file.close();
-
-		for (auto it = m_nodes.begin(); it != m_nodes.end(); ++it)
-		{
-			for (int i = 0; i < 2; i++)
-			{
-				AddDependencies(it->second, temp);
-			}
-
-			std::cout << it->second.m_identifier;
-
-			for (int i = 0; i < it->second.m_dependencies.size(); ++i)
-			{
-				std::cout << "<->" << it->second.m_dependencies[i];
-			}
-
-			std::cout << "\n";
-
-			if (it->second.m_identifier != last)
-			{
-				std::cout << "|\n";
-			}
-
-			if (!it->second.m_dependencies.empty())
-			{
-				if (m_levels < it->second.m_dependencies.size())
-				{
-					m_levels = it->second.m_dependencies.size();
-				}
-			}
-		}
-
-		for (auto it = m_nodes.begin(); it != m_nodes.end(); ++it)
-		{
-			setPosition(it->second);
-		}
-
-		run();
-	}else
-	{
-		std::cout << "Unable to open file.\n";
+		closedir (dir);
 	}
 
+	std::map<std::string, Node> temp;
 
+	std::string last;
+
+	for (int i = 2; i < files.size(); i++)
+	{
+		if (files[i][files[i].size() - 1] == 'h' && files[i][files[i].size() - 2] == '.')
+		{
+			std::ifstream file;
+			file.open(p_path + files[i]);
+
+			if (file.is_open())
+			{
+				std::string dependencies;
+
+				dependencies.insert(dependencies.begin(), files[i].begin(), files[i].end());
+				dependencies.push_back(':');
+
+				while (!file.eof())
+				{
+					std::string line;
+					std::getline(file, line);
+
+					if (line.size() > 8)
+					{
+						std::string tag;
+						tag.insert(tag.begin(), line.begin(), line.begin() + 8);
+
+						if (tag == "#include")
+						{
+							tag.clear();
+							tag.insert(tag.begin(), line.begin() + 10, line.begin() + line.size() - 1);
+
+							dependencies.insert(dependencies.end(), tag.begin(), tag.end());
+							dependencies.push_back(';');
+
+							std::cout << tag << "\n";
+						}
+					}
+				}
+
+				Node node(dependencies);
+
+				temp[node.m_identifier] = node;
+
+				node.m_dependencies.clear();
+
+				m_nodes[node.m_identifier] = node;
+
+				last = node.m_identifier;
+
+				file.close();
+			}
+		}
+	}
+
+	for (auto it = m_nodes.begin(); it != m_nodes.end(); ++it)
+	{
+		for (int i = 0; i < 2; i++)
+		{
+			AddDependencies(it->second, temp);
+		}
+
+		if (!it->second.m_dependencies.empty())
+		{
+			if (m_levels < it->second.m_dependencies.size())
+			{
+				m_levels = it->second.m_dependencies.size();
+			}
+		}
+	}
+
+	for (auto it = m_nodes.begin(); it != m_nodes.end(); ++it)
+	{
+		setPosition(it->second);
+	}
+
+	run();
 }
 
 Main::~Main()
@@ -110,7 +130,7 @@ void Main::run()
 	}
 }
 
-void Main::AddDependencies(Node & p_node, std::map<char, Node> & p_temp)
+void Main::AddDependencies(Node & p_node, std::map<std::string, Node> & p_temp)
 {
 	for (int i = 0; i < p_temp[p_node.m_identifier].m_dependencies.size(); i++)
 	{
@@ -118,7 +138,7 @@ void Main::AddDependencies(Node & p_node, std::map<char, Node> & p_temp)
 	}
 }
 
-void Main::AddDependencies(Node & p_node, const char & p_identifier, std::map<char, Node> & p_temp)
+void Main::AddDependencies(Node & p_node, const std::string & p_identifier, std::map<std::string, Node> & p_temp)
 {
 	if (m_nodes.find(p_identifier) != m_nodes.end())
 	{
@@ -134,7 +154,7 @@ void Main::AddDependencies(Node & p_node, const char & p_identifier, std::map<ch
 	}
 }
 
-bool Main::find(const Node & p_node, const char & p_identifier) const
+bool Main::find(const Node & p_node, const std::string & p_identifier) const
 {
 	for (auto it = p_node.m_dependencies.begin(); it != p_node.m_dependencies.end(); ++it)
 	{

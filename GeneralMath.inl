@@ -49,6 +49,9 @@ bool math::LineIntersectsCircle(const sf::Vector2<T> & p1, const sf::Vector2<T> 
 		(p1.y > (p_pos.y + p_radius) && p2.y > (p_pos.y + p_radius)))
 	{
 		return false;
+	}else if (distance(p1, p_pos) <= p_radius || distance(p2, p_pos) <= p_radius)
+	{
+		return true;
 	}
 	
 	/*

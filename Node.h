@@ -8,9 +8,9 @@ struct Node
 	Node(const std::string & p_dependencies = "");
 	~Node();
 
-	char m_identifier;
+	std::string m_identifier;
 
-	std::vector<char> m_dependencies;
+	std::vector<std::string> m_dependencies;
 
 	sf::Vector2<int> m_position;
 };

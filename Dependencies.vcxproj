@@ -43,7 +43,7 @@
     <ClCompile>
       <WarningLevel>Level3</WarningLevel>
       <Optimization>Disabled</Optimization>
-      <AdditionalIncludeDirectories>C:\libs\SFML-2.1\include</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>C:\libs\dirent-1.20.1\include;C:\libs\SFML-2.1\include</AdditionalIncludeDirectories>
       <PreprocessorDefinitions>SFML_STATIC;_MBCS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
     </ClCompile>
     <Link>
