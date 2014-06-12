@@ -27,6 +27,8 @@ private:
 
 	bool find(const Node & p_node, const std::string & p_identifier) const;
 
+	bool find(const std::string & p_identifier, const std::vector<std::string> & p_vector) const;
+
 	sf::RenderWindow m_window;
 
 	void run();
@@ -42,4 +44,6 @@ private:
 	void setPosition(Node & p_node);
 
 	int m_levels;
+
+	sf::Font m_font;
 };

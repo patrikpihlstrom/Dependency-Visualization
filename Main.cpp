@@ -13,6 +13,8 @@ Main::Main(const std::string & p_path) :
 	m_active(true),
 	m_levels(0)
 {
+	m_font.loadFromFile("SourceCodePro-Regular.ttf");
+
 	std::vector<std::string> files;
 
 	DIR *dir;
@@ -30,7 +32,10 @@ Main::Main(const std::string & p_path) :
 
 	for (int i = 2; i < files.size(); i++)
 	{
-		if (files[i][files[i].size() - 1] == 'h' && files[i][files[i].size() - 2] == '.')
+		if ((files[i][files[i].size() - 1] == 'h' && files[i][files[i].size() - 2] == '.') ||
+			(files[i][files[i].size() - 1] == 'p' && files[i][files[i].size() - 2] == 'p' && files[i][files[i].size() - 3] == 'h' && files[i][files[i].size() - 4] == '.') ||
+			(files[i][files[i].size() - 1] == 'l' && files[i][files[i].size() - 2] == 'n' && files[i][files[i].size() - 3] == 'i' && files[i][files[i].size() - 4] == '.') ||
+			(files[i][files[i].size() - 1] == 'p' && files[i][files[i].size() - 2] == 'p' && files[i][files[i].size() - 3] == 'c' && files[i][files[i].size() - 4] == '.'))
 		{
 			std::ifstream file;
 			file.open(p_path + files[i]);
@@ -57,15 +62,21 @@ Main::Main(const std::string & p_path) :
 							tag.clear();
 							tag.insert(tag.begin(), line.begin() + 10, line.begin() + line.size() - 1);
 
+							if (!find(tag, files))
+							{
+								Node lib = Node(tag, &m_font);
+								m_nodes[tag] = lib;
+							}
+
 							dependencies.insert(dependencies.end(), tag.begin(), tag.end());
 							dependencies.push_back(';');
 
-							std::cout << tag << "\n";
+							//std::cout << tag << "\n";
 						}
 					}
 				}
 
-				Node node(dependencies);
+				Node node(dependencies, &m_font);
 
 				temp[node.m_identifier] = node;
 
@@ -82,10 +93,7 @@ Main::Main(const std::string & p_path) :
 
 	for (auto it = m_nodes.begin(); it != m_nodes.end(); ++it)
 	{
-		for (int i = 0; i < 2; i++)
-		{
-			AddDependencies(it->second, temp);
-		}
+		AddDependencies(it->second, temp);
 
 		if (!it->second.m_dependencies.empty())
 		{
@@ -167,6 +175,19 @@ bool Main::find(const Node & p_node, const std::string & p_identifier) const
 	return false;
 }
 
+bool Main::find(const std::string & p_identifier, const std::vector<std::string> & p_vector) const
+{
+	for (int i = 0; i < p_vector.size(); i++)
+	{
+		if (p_vector[i] == p_identifier)
+		{
+			return true;
+		}
+	}
+
+	return false;
+}
+
 void Main::setPosition(Node & p_node)
 {
 	float angle = math::random(0, 360);
@@ -180,6 +201,17 @@ void Main::setPosition(Node & p_node)
 
 	p_node.m_position.x = std::cos(angle)*radius + 320;
 	p_node.m_position.y = std::sin(angle)*radius + 320;
+
+	for (auto it = m_nodes.begin(); it != m_nodes.end(); ++it)
+	{
+		if (it->second.m_identifier != p_node.m_identifier && it->second.m_position != sf::Vector2<int>(-1, -1))
+		{
+			if (math::distance(p_node.m_position, it->second.m_position) <= 10)
+			{
+				setPosition(p_node);
+			}
+		}
+	}
 }
 
 void Main::handleEvents()
@@ -204,20 +236,14 @@ void Main::handleEvents()
 
 void Main::update(const sf::Time & p_deltaTime)
 {
-	if (sf::Keyboard::isKeyPressed(sf::Keyboard::Space))
-	{
-		for (auto it = m_nodes.begin(); it != m_nodes.end(); ++it)
-		{
-			setPosition(it->second);
-		}
-	}
+
 }
 
 void Main::render()
 {
 	m_window.clear(sf::Color(50, 50, 50));
 	sf::VertexArray lines;
-	lines.setPrimitiveType(sf::PrimitiveType::Lines);
+	lines.setPrimitiveType(sf::PrimitiveType::LinesStrip);
 
 	for (auto it = m_nodes.begin(); it != m_nodes.end(); ++it)
 	{
@@ -231,7 +257,7 @@ void Main::render()
 		for (auto iter = it->second.m_dependencies.begin(); iter != it->second.m_dependencies.end(); ++iter)
 		{
 			sf::Vertex point;
-			point.position = sf::Vector2<float>(it->second.m_position.x + 5, it->second.m_position .y + 5);
+			point.position = sf::Vector2<float>(it->second.m_position.x, it->second.m_position.y);
 			point.color = color;
 
 			lines.append(point);
@@ -244,7 +270,7 @@ void Main::render()
 			}
 
 			sf::Vertex _point;
-			_point.position = sf::Vector2<float>(m_nodes[*iter].m_position.x + 5, m_nodes[*iter].m_position.y + 5);
+			_point.position = sf::Vector2<float>(m_nodes[*iter].m_position.x, m_nodes[*iter].m_position.y);
 			_point.color = _color;
 
 			lines.append(_point);
@@ -253,14 +279,10 @@ void Main::render()
 
 	m_window.draw(lines);
 
+	std::vector<sf::Text> texts;
+
 	for (auto it = m_nodes.begin(); it != m_nodes.end(); ++it)
 	{
-		sf::CircleShape node(10);
-
-		node.setOrigin(5, 5);
-
-		node.setPosition(it->second.m_position.x, it->second.m_position.y);
-
 		sf::Color color = sf::Color(255, 255, 255, 500*((float)((float)it->second.m_dependencies.size()/(float)m_levels)));
 
 		if (color.a < 50)
@@ -268,9 +290,14 @@ void Main::render()
 			color.a = 50;
 		}
 
-		node.setFillColor(color);
+		
 
-		m_window.draw(node);
+		it->second.draw(m_window, color, (math::distance(sf::Mouse::getPosition(m_window), it->second.m_position) <= 10), texts);
+	}
+
+	if (!texts.empty())
+	{
+		m_window.draw(texts[0]);
 	}
 
 	m_window.display();
