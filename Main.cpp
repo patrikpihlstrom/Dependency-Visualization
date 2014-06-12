@@ -154,7 +154,7 @@ void Main::setPosition(Node & p_node)
 
 	angle = math::toRadians(angle);
 
-	float radius = 320 - (310/m_levels)*p_node.m_dependencies.size();
+	float radius = 310 - (310/m_levels)*p_node.m_dependencies.size();
 
 	//std::cout << p_node.m_identifier << ": " << radius << "\n";
 
@@ -201,17 +201,31 @@ void Main::render()
 
 	for (auto it = m_nodes.begin(); it != m_nodes.end(); ++it)
 	{
+		sf::Color color = sf::Color(255, 255, 255, 500*((float)((float)it->second.m_dependencies.size()/(float)m_levels)));
+
+		if (color.a < 50)
+		{
+			color.a = 50;
+		}
+
 		for (auto iter = it->second.m_dependencies.begin(); iter != it->second.m_dependencies.end(); ++iter)
 		{
 			sf::Vertex point;
-			point.position = (sf::Vector2<float>)it->second.m_position;
-			point.color = sf::Color::White;
+			point.position = sf::Vector2<float>(it->second.m_position.x + 5, it->second.m_position .y + 5);
+			point.color = color;
 
 			lines.append(point);
 
+			sf::Color _color = sf::Color(255, 255, 255, 500*((float)((float)m_nodes[*iter].m_dependencies.size()/(float)m_levels)));
+
+			if (_color.a < 50)
+			{
+				_color.a = 50;
+			}
+
 			sf::Vertex _point;
-			_point.position = (sf::Vector2<float>)m_nodes[*iter].m_position;
-			_point.color = sf::Color::Black;
+			_point.position = sf::Vector2<float>(m_nodes[*iter].m_position.x + 5, m_nodes[*iter].m_position.y + 5);
+			_point.color = _color;
 
 			lines.append(_point);
 		}
@@ -227,7 +241,14 @@ void Main::render()
 
 		node.setPosition(it->second.m_position.x, it->second.m_position.y);
 
-		node.setFillColor(sf::Color::White);
+		sf::Color color = sf::Color(255, 255, 255, 500*((float)((float)it->second.m_dependencies.size()/(float)m_levels)));
+
+		if (color.a < 50)
+		{
+			color.a = 50;
+		}
+
+		node.setFillColor(color);
 
 		m_window.draw(node);
 	}
