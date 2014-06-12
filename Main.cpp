@@ -52,7 +52,7 @@ Main::Main(const std::string & p_path) :
 					std::string line;
 					std::getline(file, line);
 
-					if (line.size() > 8)
+					if (line.size() >= 8)
 					{
 						std::string tag;
 						tag.insert(tag.begin(), line.begin(), line.begin() + 8);

@@ -11,3 +11,5 @@ Example Images
 
 A more realistic example image:
 ![alt text](http://i.imgur.com/o7qHhSK.png "Transitive Dependency Visualization Example Image")
+
+![alt text](http://i.imgur.com/H1Nbsac.png "Transitive Dependency Visualization Example Image")
