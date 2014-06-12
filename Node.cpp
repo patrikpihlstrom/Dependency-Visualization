@@ -57,7 +57,7 @@ void Node::draw(sf::RenderWindow & p_renderWindow, const sf::Color & p_color, co
 	if (p_selected)
 	{
 		sf::Text text;
-		text.setColor(sf::Color::Black);
+		text.setColor(sf::Color::White);
 		text.setStyle(sf::Text::Style::Bold);
 		text.setFont(*ptr_font);
 		text.setString(m_identifier);

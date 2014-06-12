@@ -34,8 +34,7 @@ Main::Main(const std::string & p_path) :
 	{
 		if ((files[i][files[i].size() - 1] == 'h' && files[i][files[i].size() - 2] == '.') ||
 			(files[i][files[i].size() - 1] == 'p' && files[i][files[i].size() - 2] == 'p' && files[i][files[i].size() - 3] == 'h' && files[i][files[i].size() - 4] == '.') ||
-			(files[i][files[i].size() - 1] == 'l' && files[i][files[i].size() - 2] == 'n' && files[i][files[i].size() - 3] == 'i' && files[i][files[i].size() - 4] == '.') ||
-			(files[i][files[i].size() - 1] == 'p' && files[i][files[i].size() - 2] == 'p' && files[i][files[i].size() - 3] == 'c' && files[i][files[i].size() - 4] == '.'))
+			(files[i][files[i].size() - 1] == 'l' && files[i][files[i].size() - 2] == 'n' && files[i][files[i].size() - 3] == 'i' && files[i][files[i].size() - 4] == '.'))
 		{
 			std::ifstream file;
 			file.open(p_path + files[i]);
@@ -297,6 +296,13 @@ void Main::render()
 
 	if (!texts.empty())
 	{
+		sf::RectangleShape rect;
+		rect.setFillColor(sf::Color(50, 50, 50));
+		rect.setPosition(texts[0].getPosition().x - 2.5f, texts[0].getPosition().y + 2.5f);
+		rect.setSize(sf::Vector2<float>(texts[0].getGlobalBounds().width + 5, texts[0].getGlobalBounds().height + 5));
+		
+		m_window.draw(rect);
+
 		m_window.draw(texts[0]);
 	}
 
