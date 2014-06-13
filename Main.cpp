@@ -15,6 +15,13 @@ Main::Main(const std::string & p_path) :
 {
 	m_font.loadFromFile("SourceCodePro-Regular.ttf");
 
+	m_nodeTexture.loadFromFile("Node.png");
+
+	m_fileTypeColors[".h"] = sf::Color(112, 13, 38);
+	m_fileTypeColors[".hpp"] = sf::Color(54, 202, 182);
+	m_fileTypeColors[".cpp"] = sf::Color(38, 38, 116);
+	m_fileTypeColors[".inl"] = sf::Color(108, 145, 209);
+
 	std::vector<std::string> files;
 
 	DIR *dir;
@@ -28,13 +35,12 @@ Main::Main(const std::string & p_path) :
 
 	std::map<std::string, Node> temp;
 
-	std::string last;
-
 	for (int i = 2; i < files.size(); i++)
 	{
-		if ((files[i][files[i].size() - 1] == 'h' && files[i][files[i].size() - 2] == '.') ||
-			(files[i][files[i].size() - 1] == 'p' && files[i][files[i].size() - 2] == 'p' && files[i][files[i].size() - 3] == 'h' && files[i][files[i].size() - 4] == '.') ||
-			(files[i][files[i].size() - 1] == 'l' && files[i][files[i].size() - 2] == 'n' && files[i][files[i].size() - 3] == 'i' && files[i][files[i].size() - 4] == '.'))
+		if ((files[i].size() >= 3 && (files[i][files[i].size() - 1] == 'h' && files[i][files[i].size() - 2] == '.')) ||
+			(files[i].size() >= 5 && (files[i][files[i].size() - 1] == 'p' && files[i][files[i].size() - 2] == 'p' && files[i][files[i].size() - 3] == 'h' && files[i][files[i].size() - 4] == '.')) ||
+			(files[i].size() >= 5 && (files[i][files[i].size() - 1] == 'l' && files[i][files[i].size() - 2] == 'n' && files[i][files[i].size() - 3] == 'i' && files[i][files[i].size() - 4] == '.')) ||
+			(files[i].size() >= 5 && (files[i][files[i].size() - 1] == 'p' && files[i][files[i].size() - 2] == 'p' && files[i][files[i].size() - 3] == 'c' && files[i][files[i].size() - 4] == '.')))
 		{
 			std::ifstream file;
 			file.open(p_path + files[i]);
@@ -61,10 +67,25 @@ Main::Main(const std::string & p_path) :
 							tag.clear();
 							tag.insert(tag.begin(), line.begin() + 10, line.begin() + line.size() - 1);
 
+							//outside dependency
 							if (!find(tag, files))
 							{
-								Node lib = Node(tag, &m_font);
+								Node lib = Node(tag, &m_font, m_nodeTexture);
 								m_nodes[tag] = lib;
+
+								if (tag[tag.size() - 1] == 'h' && tag[tag.size() - 2] == '.')
+								{
+									m_nodes[tag].m_sprite.setColor(m_fileTypeColors[".h"]);
+								}else if (tag[tag.size() - 1] == 'p' && tag[tag.size() - 2] == 'p' && tag[tag.size() - 3] == 'h' && tag[tag.size() - 4] == '.')
+								{
+									m_nodes[tag].m_sprite.setColor(m_fileTypeColors[".hpp"]);
+								}else if (tag[tag.size() - 1] == 'l' && tag[tag.size() - 2] == 'n' && tag[tag.size() - 3] == 'i' && tag[tag.size() - 4] == '.')
+								{
+									m_nodes[tag].m_sprite.setColor(m_fileTypeColors[".inl"]);
+								}else if (tag[tag.size() - 1] == 'p' && tag[tag.size() - 2] == 'p' && tag[tag.size() - 3] == 'c' && tag[tag.size() - 4] == '.')
+								{
+									m_nodes[tag].m_sprite.setColor(m_fileTypeColors[".cpp"]);
+								}
 							}
 
 							dependencies.insert(dependencies.end(), tag.begin(), tag.end());
@@ -75,7 +96,7 @@ Main::Main(const std::string & p_path) :
 					}
 				}
 
-				Node node(dependencies, &m_font);
+				Node node(dependencies, &m_font, m_nodeTexture);
 
 				temp[node.m_identifier] = node;
 
@@ -83,7 +104,19 @@ Main::Main(const std::string & p_path) :
 
 				m_nodes[node.m_identifier] = node;
 
-				last = node.m_identifier;
+				if (node.m_identifier[node.m_identifier.size() - 1] == 'h' && node.m_identifier[node.m_identifier.size() - 2] == '.')
+				{
+					m_nodes[node.m_identifier].m_sprite.setColor(m_fileTypeColors[".h"]);
+				}else if (node.m_identifier[node.m_identifier.size() - 1] == 'p' && node.m_identifier[node.m_identifier.size() - 2] == 'p' && node.m_identifier[node.m_identifier.size() - 3] == 'h' && node.m_identifier[node.m_identifier.size() - 4] == '.')
+				{
+					m_nodes[node.m_identifier].m_sprite.setColor(m_fileTypeColors[".hpp"]);
+				}else if (node.m_identifier[node.m_identifier.size() - 1] == 'l' && node.m_identifier[node.m_identifier.size() - 2] == 'n' && node.m_identifier[node.m_identifier.size() - 3] == 'i' && node.m_identifier[node.m_identifier.size() - 4] == '.')
+				{
+					m_nodes[node.m_identifier].m_sprite.setColor(m_fileTypeColors[".inl"]);
+				}else if (node.m_identifier[node.m_identifier.size() - 1] == 'p' && node.m_identifier[node.m_identifier.size() - 2] == 'p' && node.m_identifier[node.m_identifier.size() - 3] == 'c' && node.m_identifier[node.m_identifier.size() - 4] == '.')
+				{
+					m_nodes[node.m_identifier].m_sprite.setColor(m_fileTypeColors[".cpp"]);
+				}
 
 				file.close();
 			}
@@ -93,6 +126,7 @@ Main::Main(const std::string & p_path) :
 	for (auto it = m_nodes.begin(); it != m_nodes.end(); ++it)
 	{
 		AddDependencies(it->second, temp);
+
 
 		if (!it->second.m_dependencies.empty())
 		{
@@ -203,14 +237,13 @@ void Main::setPosition(Node & p_node)
 
 	for (auto it = m_nodes.begin(); it != m_nodes.end(); ++it)
 	{
-		if (it->second.m_identifier != p_node.m_identifier && it->second.m_position != sf::Vector2<int>(-1, -1))
+		while (it->second.m_identifier != p_node.m_identifier && it->second.m_position.x != -1 && math::distance(it->second.m_position, p_node.m_position) <= 10)
 		{
-			if (math::distance(p_node.m_position, it->second.m_position) <= 10)
-			{
-				setPosition(p_node);
-			}
+			setPosition(p_node);
 		}
 	}
+
+	p_node.m_sprite.setPosition(p_node.m_position.x, p_node.m_position.y);
 }
 
 void Main::handleEvents()
@@ -240,7 +273,7 @@ void Main::update(const sf::Time & p_deltaTime)
 
 void Main::render()
 {
-	m_window.clear(sf::Color(50, 50, 50));
+	m_window.clear(sf::Color(46, 46, 46));
 	sf::VertexArray lines;
 	lines.setPrimitiveType(sf::PrimitiveType::LinesStrip);
 
@@ -282,28 +315,27 @@ void Main::render()
 
 	for (auto it = m_nodes.begin(); it != m_nodes.end(); ++it)
 	{
-		sf::Color color = sf::Color(255, 255, 255, 500*((float)((float)it->second.m_dependencies.size()/(float)m_levels)));
-
-		if (color.a < 50)
-		{
-			color.a = 50;
-		}
-
-		
-
-		it->second.draw(m_window, color, (math::distance(sf::Mouse::getPosition(m_window), it->second.m_position) <= 10), texts);
+		it->second.draw(m_window, (math::distance(sf::Mouse::getPosition(m_window), it->second.m_position) <= 10), texts);
 	}
 
 	if (!texts.empty())
 	{
 		sf::RectangleShape rect;
-		rect.setFillColor(sf::Color(50, 50, 50));
-		rect.setPosition(texts[0].getPosition().x - 2.5f, texts[0].getPosition().y + 2.5f);
-		rect.setSize(sf::Vector2<float>(texts[0].getGlobalBounds().width + 5, texts[0].getGlobalBounds().height + 5));
+
+		if (m_nodes[texts[texts.size() - 1].getString()].m_sprite.getColor() != sf::Color::White)
+		{
+			rect.setFillColor(m_nodes[texts[texts.size() - 1].getString()].m_sprite.getColor());
+		}else
+		{
+			rect.setFillColor(sf::Color(50, 50, 50));
+		}
 		
+		rect.setPosition(texts[texts.size() - 1].getPosition().x - 2.5f, texts[texts.size() - 1].getPosition().y + 2.5f);
+		rect.setSize(sf::Vector2<float>(texts[texts.size() - 1].getGlobalBounds().width + 5, texts[texts.size() - 1].getGlobalBounds().height + 5));
+
 		m_window.draw(rect);
 
-		m_window.draw(texts[0]);
+		m_window.draw(texts[texts.size() - 1]);
 	}
 
 	m_window.display();

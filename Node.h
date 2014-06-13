@@ -6,10 +6,11 @@
 #include <SFML\Graphics\CircleShape.hpp>
 #include <SFML\Graphics\Font.hpp>
 #include <SFML\Graphics\Text.hpp>
+#include <SFML\Graphics\Sprite.hpp>
 
 struct Node
 {
-	Node(const std::string & p_dependencies = "", sf::Font* ptr_font = NULL);
+	Node(const std::string & p_dependencies = "", sf::Font* ptr_font = NULL, const sf::Texture & p_texture = sf::Texture());
 	~Node();
 
 	std::string m_identifier;
@@ -20,5 +21,7 @@ struct Node
 	
 	sf::Font* ptr_font;
 
-	void draw(sf::RenderWindow & p_renderWindow, const sf::Color & p_color, const bool & p_selected, std::vector<sf::Text> & p_texts);
+	sf::Sprite m_sprite;
+
+	void draw(sf::RenderWindow & p_renderWindow, const bool & p_selected, std::vector<sf::Text> & p_texts);
 };

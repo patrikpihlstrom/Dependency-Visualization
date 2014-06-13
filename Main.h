@@ -47,4 +47,8 @@ private:
 	int m_levels;
 
 	sf::Font m_font;
+
+	std::map<std::string, sf::Color> m_fileTypeColors;
+
+	sf::Texture m_nodeTexture;
 };
