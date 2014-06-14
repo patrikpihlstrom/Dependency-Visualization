@@ -1,6 +1,7 @@
 #pragma once
 #include <vector>
 #include <string>
+#include <iostream>
 #include <SFML\System\Vector2.hpp>
 #include <SFML\Graphics\RenderWindow.hpp>
 #include <SFML\Graphics\CircleShape.hpp>
@@ -23,5 +24,5 @@ struct Node
 
 	sf::Sprite m_sprite;
 
-	void draw(sf::RenderWindow & p_renderWindow, const bool & p_selected, std::vector<sf::Text> & p_texts);
+	void draw(sf::RenderWindow & p_renderWindow, const bool & p_selected, sf::Text & p_text);
 };

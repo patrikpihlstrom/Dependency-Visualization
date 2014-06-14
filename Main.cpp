@@ -57,7 +57,7 @@ Main::Main(const std::string & p_path) :
 					std::string line;
 					std::getline(file, line);
 
-					if (line.size() >= 8)
+					if (line.size() > 10)
 					{
 						std::string tag;
 						tag.insert(tag.begin(), line.begin(), line.begin() + 8);
@@ -88,8 +88,11 @@ Main::Main(const std::string & p_path) :
 								}
 							}
 
-							dependencies.insert(dependencies.end(), tag.begin(), tag.end());
-							dependencies.push_back(';');
+							//if (find(tag, files))
+							{
+								dependencies.insert(dependencies.end(), tag.begin(), tag.end());
+								dependencies.push_back(';');
+							}
 
 							//std::cout << tag << "\n";
 						}
@@ -311,31 +314,31 @@ void Main::render()
 
 	m_window.draw(lines);
 
-	std::vector<sf::Text> texts;
+	sf::Text text;
 
 	for (auto it = m_nodes.begin(); it != m_nodes.end(); ++it)
 	{
-		it->second.draw(m_window, (math::distance(sf::Mouse::getPosition(m_window), it->second.m_position) <= 10), texts);
+		it->second.draw(m_window, (math::distance(sf::Mouse::getPosition(m_window), it->second.m_position) <= 10), text);
 	}
 
-	if (!texts.empty())
+	if (!text.getString().toAnsiString().empty())
 	{
 		sf::RectangleShape rect;
 
-		if (m_nodes[texts[texts.size() - 1].getString()].m_sprite.getColor() != sf::Color::White)
+		if (m_nodes[text.getString()].m_sprite.getColor() != sf::Color::White)
 		{
-			rect.setFillColor(m_nodes[texts[texts.size() - 1].getString()].m_sprite.getColor());
+			rect.setFillColor(m_nodes[text.getString()].m_sprite.getColor());
 		}else
 		{
 			rect.setFillColor(sf::Color(50, 50, 50));
 		}
 		
-		rect.setPosition(texts[texts.size() - 1].getPosition().x - 2.5f, texts[texts.size() - 1].getPosition().y + 2.5f);
-		rect.setSize(sf::Vector2<float>(texts[texts.size() - 1].getGlobalBounds().width + 5, texts[texts.size() - 1].getGlobalBounds().height + 5));
+		rect.setPosition(text.getPosition().x - 2.5f, text.getPosition().y + 2.5f);
+		rect.setSize(sf::Vector2<float>(text.getGlobalBounds().width + 5, text.getGlobalBounds().height + 5));
 
 		m_window.draw(rect);
 
-		m_window.draw(texts[texts.size() - 1]);
+		m_window.draw(text);
 	}
 
 	m_window.display();

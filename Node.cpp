@@ -27,7 +27,7 @@ Node::Node(const std::string & p_dependencies, sf::Font* ptr_font, const sf::Tex
 		{
 			std::string dependency;
 
-			for (int i = index; i < p_dependencies.size(); i++)
+			for (int i = index + 1; i < p_dependencies.size(); i++)
 			{
 				if (p_dependencies[i] != ';')
 				{
@@ -47,12 +47,18 @@ Node::~Node()
 
 }
 
-void Node::draw(sf::RenderWindow & p_renderWindow, const bool & p_selected, std::vector<sf::Text> & p_texts)
+void Node::draw(sf::RenderWindow & p_renderWindow, const bool & p_selected, sf::Text & p_text)
 {
 	p_renderWindow.draw(m_sprite);
 
 	if (p_selected)
 	{
+
+		for (int i = 0; i < m_dependencies.size(); ++i)
+		{
+			std::cout << m_dependencies[i] << "\n";
+		}
+
 		sf::Text text;
 		text.setColor(sf::Color::White);
 		text.setStyle(sf::Text::Style::Bold);
@@ -68,6 +74,6 @@ void Node::draw(sf::RenderWindow & p_renderWindow, const bool & p_selected, std:
 			text.setPosition(m_position.x - text.getGlobalBounds().width - 25, text.getPosition().y);
 		}
 
-		p_texts.push_back(text);
+		p_text = text;
 	}
 }
