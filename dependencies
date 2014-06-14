@@ -1,22 +1,7 @@
-a: J
-A: K
+a: b
 b: c
-B: K
-c: K
-C: K
-d: b I k
-D: H f E A c g I B k K G C
-e: F a
-E: e F f
-f: F
-F: K
-g: K
-G: I  H
-h: K
-H: g i
-i: K
-I: g j
-j: K
-J: I j
-k: K J
-K: 
+c: d
+d: e
+e: f
+f: g
+g: 

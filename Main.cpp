@@ -238,14 +238,6 @@ void Main::setPosition(Node & p_node)
 	p_node.m_position.x = std::cos(angle)*radius + 320;
 	p_node.m_position.y = std::sin(angle)*radius + 320;
 
-	for (auto it = m_nodes.begin(); it != m_nodes.end(); ++it)
-	{
-		while (it->second.m_identifier != p_node.m_identifier && it->second.m_position.x != -1 && math::distance(it->second.m_position, p_node.m_position) <= 10)
-		{
-			setPosition(p_node);
-		}
-	}
-
 	p_node.m_sprite.setPosition(p_node.m_position.x, p_node.m_position.y);
 }
 
@@ -271,7 +263,13 @@ void Main::handleEvents()
 
 void Main::update(const sf::Time & p_deltaTime)
 {
-
+	if (sf::Keyboard::isKeyPressed(sf::Keyboard::Space))
+	{
+		for (auto it = m_nodes.begin(); it != m_nodes.end(); ++it)
+		{
+			setPosition(it->second);
+		}
+	}
 }
 
 void Main::render()
@@ -282,33 +280,38 @@ void Main::render()
 
 	for (auto it = m_nodes.begin(); it != m_nodes.end(); ++it)
 	{
-		sf::Color color = sf::Color(255, 255, 255, 500*((float)((float)it->second.m_dependencies.size()/(float)m_levels)));
+		bool selected = (math::distance(sf::Mouse::getPosition(m_window), it->second.m_position) <= 10);
 
-		if (color.a < 50)
+		//if (selected)
 		{
-			color.a = 50;
-		}
+			sf::Color color = sf::Color(255, 255, 255, 500*((float)((float)it->second.m_dependencies.size()/(float)m_levels)));
 
-		for (auto iter = it->second.m_dependencies.begin(); iter != it->second.m_dependencies.end(); ++iter)
-		{
-			sf::Vertex point;
-			point.position = sf::Vector2<float>(it->second.m_position.x, it->second.m_position.y);
-			point.color = color;
-
-			lines.append(point);
-
-			sf::Color _color = sf::Color(255, 255, 255, 500*((float)((float)m_nodes[*iter].m_dependencies.size()/(float)m_levels)));
-
-			if (_color.a < 50)
+			if (color.a < 50)
 			{
-				_color.a = 50;
+				color.a = 50;
 			}
 
-			sf::Vertex _point;
-			_point.position = sf::Vector2<float>(m_nodes[*iter].m_position.x, m_nodes[*iter].m_position.y);
-			_point.color = _color;
+			for (auto iter = it->second.m_dependencies.begin(); iter != it->second.m_dependencies.end(); ++iter)
+			{
+				sf::Vertex point;
+				point.position = sf::Vector2<float>(it->second.m_position.x, it->second.m_position.y);
+				point.color = color;
 
-			lines.append(_point);
+				lines.append(point);
+
+				sf::Color _color = sf::Color(255, 255, 255, 500*((float)((float)m_nodes[*iter].m_dependencies.size()/(float)m_levels)));
+
+				if (_color.a < 50)
+				{
+					_color.a = 50;
+				}
+
+				sf::Vertex _point;
+				_point.position = sf::Vector2<float>(m_nodes[*iter].m_position.x, m_nodes[*iter].m_position.y);
+				_point.color = _color;
+
+				lines.append(_point);
+			}
 		}
 	}
 
@@ -332,7 +335,7 @@ void Main::render()
 		{
 			rect.setFillColor(sf::Color(50, 50, 50));
 		}
-		
+
 		rect.setPosition(text.getPosition().x - 2.5f, text.getPosition().y + 2.5f);
 		rect.setSize(sf::Vector2<float>(text.getGlobalBounds().width + 5, text.getGlobalBounds().height + 5));
 

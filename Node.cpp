@@ -53,12 +53,6 @@ void Node::draw(sf::RenderWindow & p_renderWindow, const bool & p_selected, sf::
 
 	if (p_selected)
 	{
-
-		for (int i = 0; i < m_dependencies.size(); ++i)
-		{
-			std::cout << m_dependencies[i] << "\n";
-		}
-
 		sf::Text text;
 		text.setColor(sf::Color::White);
 		text.setStyle(sf::Text::Style::Bold);

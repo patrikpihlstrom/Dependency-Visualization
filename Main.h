@@ -5,7 +5,6 @@
 #include <fstream>
 #include <SFML\Graphics\RenderWindow.hpp>
 #include <SFML\Window\Event.hpp>
-#include <SFML\Graphics\CircleShape.hpp>
 #include <SFML\Graphics\Font.hpp>
 #include <SFML\Graphics\RectangleShape.hpp>
 #include <dirent.h>
