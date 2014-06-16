@@ -43,7 +43,7 @@ private:
 
 	void setPosition(Node & p_node);
 
-	int m_levels;
+	unsigned int m_levels;
 
 	sf::Font m_font;
 

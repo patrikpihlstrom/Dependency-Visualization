@@ -47,12 +47,43 @@ Node::~Node()
 
 }
 
-void Node::draw(sf::RenderWindow & p_renderWindow, const bool & p_selected, sf::Text & p_text)
+void Node::draw(sf::RenderWindow & p_renderWindow, const bool & p_selected, sf::Text & p_text, const std::map<std::string, Node> & p_nodes, const unsigned int & p_levels, sf::VertexArray & p_lines) const
 {
 	p_renderWindow.draw(m_sprite);
 
 	if (p_selected)
 	{
+		p_lines.setPrimitiveType(sf::PrimitiveType::Lines);
+
+		sf::Color color = sf::Color(255, 255, 255, 500*((float)((float)m_dependencies.size()/(float)p_levels)));
+
+		if (color.a < 50)
+		{
+			color.a = 50;
+		}
+
+		for (auto it = m_dependencies.begin(); it != m_dependencies.end(); ++it)
+		{
+			sf::Vertex point;
+			point.position = sf::Vector2<float>(m_position.x, m_position.y);
+			point.color = color;
+
+			p_lines.append(point);
+
+			sf::Color _color = sf::Color(255, 255, 255, 500*((float)((float)p_nodes.at(*it).m_dependencies.size()/(float)p_levels)));
+
+			if (_color.a < 50)
+			{
+				_color.a = 50;
+			}
+
+			sf::Vertex _point;
+			_point.position = sf::Vector2<float>(p_nodes.at(*it).m_position.x, p_nodes.at(*it).m_position.y);
+			_point.color = _color;
+
+			p_lines.append(_point);
+		}
+
 		sf::Text text;
 		text.setColor(sf::Color::White);
 		text.setStyle(sf::Text::Style::Bold);
@@ -62,7 +93,7 @@ void Node::draw(sf::RenderWindow & p_renderWindow, const bool & p_selected, sf::
 		text.setScale(0.5f, 0.5f);
 
 		text.setPosition(m_position.x + 25, m_position.y - 10);
-		
+
 		if (text.getPosition().x + text.getGlobalBounds().width >= 640)
 		{
 			text.setPosition(m_position.x - text.getGlobalBounds().width - 25, text.getPosition().y);

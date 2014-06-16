@@ -24,5 +24,5 @@ struct Node
 
 	sf::Sprite m_sprite;
 
-	void draw(sf::RenderWindow & p_renderWindow, const bool & p_selected, sf::Text & p_text);
+	void draw(sf::RenderWindow & p_renderWindow, const bool & p_selected, sf::Text & p_text, const std::map<std::string, Node> & p_nodes, const unsigned int & p_levels, sf::VertexArray & p_lines) const;
 };

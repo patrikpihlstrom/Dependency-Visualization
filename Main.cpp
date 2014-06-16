@@ -38,7 +38,7 @@ Main::Main(const std::string & p_path) :
 	for (int i = 2; i < files.size(); i++)
 	{
 		if ((files[i].size() >= 3 && (files[i][files[i].size() - 1] == 'h' && files[i][files[i].size() - 2] == '.')) ||
-			(files[i].size() >= 5 && (files[i][files[i].size() - 1] == 'p' && files[i][files[i].size() - 2] == 'p' && files[i][files[i].size() - 3] == 'h' && files[i][files[i].size() - 4] == '.')) ||
+			(files[i].size() >= 5 && (files[i][files[i].size() - 1] == 'p' && files[i][files[i].size() - 2] == 'p' && files[i][files[i].size() - 3] == 'h' && files[i][files[i].size() - 4] == '.')) ||00
 			(files[i].size() >= 5 && (files[i][files[i].size() - 1] == 'l' && files[i][files[i].size() - 2] == 'n' && files[i][files[i].size() - 3] == 'i' && files[i][files[i].size() - 4] == '.')) ||
 			(files[i].size() >= 5 && (files[i][files[i].size() - 1] == 'p' && files[i][files[i].size() - 2] == 'p' && files[i][files[i].size() - 3] == 'c' && files[i][files[i].size() - 4] == '.')))
 		{
@@ -284,7 +284,7 @@ void Main::render()
 
 		//if (selected)
 		{
-			sf::Color color = sf::Color(255, 255, 255, 500*((float)((float)it->second.m_dependencies.size()/(float)m_levels)));
+			sf::Color color = sf::Color(255, 255, 255, 50*((float)((float)it->second.m_dependencies.size()/(float)m_levels)));
 
 			if (color.a < 50)
 			{
@@ -299,7 +299,7 @@ void Main::render()
 
 				lines.append(point);
 
-				sf::Color _color = sf::Color(255, 255, 255, 500*((float)((float)m_nodes[*iter].m_dependencies.size()/(float)m_levels)));
+				sf::Color _color = sf::Color(255, 255, 255, 50*((float)((float)m_nodes[*iter].m_dependencies.size()/(float)m_levels)));
 
 				if (_color.a < 50)
 				{
@@ -319,9 +319,19 @@ void Main::render()
 
 	sf::Text text;
 
+	sf::VertexArray highlightedLines;
+
 	for (auto it = m_nodes.begin(); it != m_nodes.end(); ++it)
 	{
-		it->second.draw(m_window, (math::distance(sf::Mouse::getPosition(m_window), it->second.m_position) <= 10), text);
+		bool selected = (math::distance(sf::Mouse::getPosition(m_window), it->second.m_position) <= 10);
+
+		it->second.draw(m_window, selected, text, m_nodes, m_levels, highlightedLines);
+
+		if (selected)
+		{
+			m_window.draw(highlightedLines);
+			highlightedLines.clear();
+		}
 	}
 
 	if (!text.getString().toAnsiString().empty())
