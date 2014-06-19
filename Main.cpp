@@ -19,8 +19,9 @@ Main::Main(const std::string & p_path) :
 
 	m_fileTypeColors[".h"] = sf::Color(112, 13, 38);
 	m_fileTypeColors[".hpp"] = sf::Color(54, 202, 182);
-	m_fileTypeColors[".cpp"] = sf::Color(38, 38, 116);
 	m_fileTypeColors[".inl"] = sf::Color(108, 145, 209);
+	m_fileTypeColors[".cpp"] = sf::Color(38, 38, 116);
+
 
 	std::vector<std::string> files;
 
@@ -37,10 +38,11 @@ Main::Main(const std::string & p_path) :
 
 	for (int i = 2; i < files.size(); i++)
 	{
-		if ((files[i].size() >= 3 && (files[i][files[i].size() - 1] == 'h' && files[i][files[i].size() - 2] == '.')) ||
-			(files[i].size() >= 5 && (files[i][files[i].size() - 1] == 'p' && files[i][files[i].size() - 2] == 'p' && files[i][files[i].size() - 3] == 'h' && files[i][files[i].size() - 4] == '.')) ||00
-			(files[i].size() >= 5 && (files[i][files[i].size() - 1] == 'l' && files[i][files[i].size() - 2] == 'n' && files[i][files[i].size() - 3] == 'i' && files[i][files[i].size() - 4] == '.')) ||
-			(files[i].size() >= 5 && (files[i][files[i].size() - 1] == 'p' && files[i][files[i].size() - 2] == 'p' && files[i][files[i].size() - 3] == 'c' && files[i][files[i].size() - 4] == '.')))
+		std::string extension = GetExtension(files[i]);
+		if (extension == ".h"   || 
+			extension == ".hpp" || 
+			extension == ".inl" || 
+			extension == ".cpp")
 		{
 			std::ifstream file;
 			file.open(p_path + files[i]);
@@ -51,6 +53,8 @@ Main::Main(const std::string & p_path) :
 
 				dependencies.insert(dependencies.begin(), files[i].begin(), files[i].end());
 				dependencies.push_back(':');
+
+				std::string _extension;
 
 				while (!file.eof())
 				{
@@ -73,28 +77,16 @@ Main::Main(const std::string & p_path) :
 								Node lib = Node(tag, &m_font, m_nodeTexture);
 								m_nodes[tag] = lib;
 
-								if (tag[tag.size() - 1] == 'h' && tag[tag.size() - 2] == '.')
+								_extension = GetExtension(tag);
+
+								if (m_fileTypeColors.find(_extension) != m_fileTypeColors.end())
 								{
-									m_nodes[tag].m_sprite.setColor(m_fileTypeColors[".h"]);
-								}else if (tag[tag.size() - 1] == 'p' && tag[tag.size() - 2] == 'p' && tag[tag.size() - 3] == 'h' && tag[tag.size() - 4] == '.')
-								{
-									m_nodes[tag].m_sprite.setColor(m_fileTypeColors[".hpp"]);
-								}else if (tag[tag.size() - 1] == 'l' && tag[tag.size() - 2] == 'n' && tag[tag.size() - 3] == 'i' && tag[tag.size() - 4] == '.')
-								{
-									m_nodes[tag].m_sprite.setColor(m_fileTypeColors[".inl"]);
-								}else if (tag[tag.size() - 1] == 'p' && tag[tag.size() - 2] == 'p' && tag[tag.size() - 3] == 'c' && tag[tag.size() - 4] == '.')
-								{
-									m_nodes[tag].m_sprite.setColor(m_fileTypeColors[".cpp"]);
+									m_nodes[tag].m_sprite.setColor(m_fileTypeColors[_extension]);
 								}
 							}
 
-							//if (find(tag, files))
-							{
-								dependencies.insert(dependencies.end(), tag.begin(), tag.end());
-								dependencies.push_back(';');
-							}
-
-							//std::cout << tag << "\n";
+							dependencies.insert(dependencies.end(), tag.begin(), tag.end());
+							dependencies.push_back(';');
 						}
 					}
 				}
@@ -107,18 +99,11 @@ Main::Main(const std::string & p_path) :
 
 				m_nodes[node.m_identifier] = node;
 
-				if (node.m_identifier[node.m_identifier.size() - 1] == 'h' && node.m_identifier[node.m_identifier.size() - 2] == '.')
+				_extension = GetExtension(node.m_identifier);
+
+				if (m_fileTypeColors.find(_extension) != m_fileTypeColors.end())
 				{
-					m_nodes[node.m_identifier].m_sprite.setColor(m_fileTypeColors[".h"]);
-				}else if (node.m_identifier[node.m_identifier.size() - 1] == 'p' && node.m_identifier[node.m_identifier.size() - 2] == 'p' && node.m_identifier[node.m_identifier.size() - 3] == 'h' && node.m_identifier[node.m_identifier.size() - 4] == '.')
-				{
-					m_nodes[node.m_identifier].m_sprite.setColor(m_fileTypeColors[".hpp"]);
-				}else if (node.m_identifier[node.m_identifier.size() - 1] == 'l' && node.m_identifier[node.m_identifier.size() - 2] == 'n' && node.m_identifier[node.m_identifier.size() - 3] == 'i' && node.m_identifier[node.m_identifier.size() - 4] == '.')
-				{
-					m_nodes[node.m_identifier].m_sprite.setColor(m_fileTypeColors[".inl"]);
-				}else if (node.m_identifier[node.m_identifier.size() - 1] == 'p' && node.m_identifier[node.m_identifier.size() - 2] == 'p' && node.m_identifier[node.m_identifier.size() - 3] == 'c' && node.m_identifier[node.m_identifier.size() - 4] == '.')
-				{
-					m_nodes[node.m_identifier].m_sprite.setColor(m_fileTypeColors[".cpp"]);
+					m_nodes[node.m_identifier].m_sprite.setColor(m_fileTypeColors[_extension]);
 				}
 
 				file.close();
@@ -172,6 +157,23 @@ void Main::run()
 			lag -= updateTime;
 		}
 	}
+}
+
+std::string Main::GetExtension(const std::string & p_fileName) const
+{
+	std::string result;
+
+	for (int i = p_fileName.size() - 1; i >= 0; --i)
+	{
+		result.insert(result.begin(), p_fileName[i]);
+
+		if (p_fileName[i] == '.')
+		{
+			break;
+		}
+	}
+
+	return result;
 }
 
 void Main::AddDependencies(Node & p_node, std::map<std::string, Node> & p_temp)

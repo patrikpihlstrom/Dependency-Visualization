@@ -50,4 +50,6 @@ private:
 	std::map<std::string, sf::Color> m_fileTypeColors;
 
 	sf::Texture m_nodeTexture;
+
+	std::string GetExtension(const std::string & p_fileName) const;
 };
